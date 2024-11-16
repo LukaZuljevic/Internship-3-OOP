@@ -41,6 +41,9 @@ namespace Internship_3_OOP
                     case "2":
                         AddProject();
                         break;
+                    case "3":
+                        DeleteProject();
+                        break;
                     default:
                         Console.WriteLine("Krivi unos, unesi ponovno!");
                         break;
@@ -126,6 +129,45 @@ namespace Internship_3_OOP
             }
 
             return dateOutput;
+        }
+
+        static void DeleteProject()
+        {
+            Console.Clear();
+
+            PrintAllProjects();
+
+            Console.Write("Unesi ime projekta koji zelis izbrisat: ");
+            var projectToDelete = Console.ReadLine();
+
+            var projectFound = false;
+
+            foreach(var project in allProjects)
+            {
+                if(project.Key.Name == projectToDelete)
+                {
+                    projectFound = true;
+
+                    Console.Write("Jesi li siguran da zelis obrisat ovaj projekt? (da, ne): ");
+                    var confirmation = Console.ReadLine();
+
+                    while(confirmation != "da" && confirmation != "ne")
+                    {
+                        Console.WriteLine("Krivi unos, unesi da ili ne!");
+                        confirmation = Console.ReadLine();
+                    }
+
+                    if(confirmation == "da")
+                    {
+                        allProjects.Remove(project.Key);
+                    }
+                }
+            }
+
+            if (!projectFound)
+            {
+                Console.WriteLine("Taj projekt ne postoji!");
+            }
         }
     }
 }
