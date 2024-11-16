@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Globalization;
+using System.Reflection.Metadata.Ecma335;
 using Internship_3_OOP.Classes;
 using Internship_3_OOP.Enum;
 
@@ -10,7 +12,7 @@ namespace Internship_3_OOP
 
         static void Main(string[] args)
         {
-            var testProject1 = new Project("Projekt A", "Prvi test projekt", new DateTime(2024,11,1), new DateTime(2024, 12, 31));
+            var testProject1 = new Project("Projekt A", "Prvi test projekt", new DateTime(2024, 11, 1), new DateTime(2024, 12, 31));
             var testProject2 = new Project("Projekt B", "Drugi test projekt", new DateTime(2024, 10, 1), new DateTime(2024, 11, 30));
 
             var testTask1 = new ProjectTask("Dizajn pocetne stranice", "Izrada dizajna", new DateTime(2024, 11, 20), 10000, testProject1);
@@ -36,6 +38,9 @@ namespace Internship_3_OOP
                     case "1":
                         PrintAllProjects();
                         break;
+                    case "2":
+                        AddProject();
+                        break;
                     default:
                         Console.WriteLine("Krivi unos, unesi ponovno!");
                         break;
@@ -47,15 +52,80 @@ namespace Internship_3_OOP
         {
             Console.Clear();
 
-            foreach(var project in allProjects)
+            foreach (var project in allProjects)
             {
                 Console.WriteLine($"Project: {project.Key.Name} Status: {project.Key.Status} ");
-                foreach(var task in project.Value)
+                foreach (var task in project.Value)
                 {
                     Console.WriteLine($"Task: {task.Name} - Status: {task.Status}, Deadline: {task.Deadline} ");
                 }
                 Console.WriteLine();
             }
+        }
+
+        static void AddProject()
+        {
+            var projectName = CheckEmptyStringAndSpecialChars("ime");
+            var projectDescription = CheckEmptyStringAndSpecialChars("opis");
+
+            var projectStart = CheckDate("pocetka");
+            var projectDeadline = CheckDate("roka");
+
+            while(DateTime.Compare(projectStart, projectDeadline) >= 0)
+            {
+                Console.WriteLine("Deadline ne moze bit prije pocetka projekta, unesi datum roka ponovno!");
+                projectDeadline = CheckDate("roka");
+            }
+
+            Project newProject = new Project(projectName, projectDescription, projectStart, projectDeadline);
+
+            allProjects.Add(newProject, new List<ProjectTask>()); 
+        }
+
+        static string CheckEmptyStringAndSpecialChars(string attribute)
+        {
+            var input = string.Empty;
+            while (true)
+            {
+                Console.Write($"Unesi {attribute} projekta: ");
+                input = Console.ReadLine();
+
+                if (string.IsNullOrWhiteSpace(input))
+                {
+                    Console.WriteLine("Ne smije biti empty string! ");
+                    continue;
+                }
+                else if(!input.All(char.IsLetter))
+                {
+                    Console.WriteLine("Smijes unit samo slova!");
+                    continue;
+                }
+
+                break;
+            }
+
+            return input;
+        }
+
+        static DateTime CheckDate(string typeOfDate)
+        {
+            DateTime dateOutput;
+
+            while (true)
+            {
+                Console.Write($"Unesi datum {typeOfDate}(yyyy-MM-dd): ");
+                var input = Console.ReadLine();
+
+                if(!DateTime.TryParseExact(input, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out dateOutput))
+                {
+                    Console.WriteLine("Krivi unos, unesi datum u formatu (yyyy-MM-dd)!");
+                    continue;
+                }
+
+                break;
+            }
+
+            return dateOutput;
         }
     }
 }
