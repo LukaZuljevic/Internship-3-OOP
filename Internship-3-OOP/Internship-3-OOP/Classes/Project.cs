@@ -22,5 +22,20 @@ namespace Internship_3_OOP.Classes
             StartOfProject = startOfProject;
             EndOfProject = endOfProject;
         }
+
+        public void Active()
+        {
+            Status = ProjectStatus.Active;
+        }
+
+        public void OnHold()
+        {
+            Status = ProjectStatus.OnHold;
+        }
+
+        public void Finished()
+        {
+            Status = ProjectStatus.Finished;
+        }
     }
 }
