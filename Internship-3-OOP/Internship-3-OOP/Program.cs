@@ -102,7 +102,7 @@ namespace Internship_3_OOP
 
             foreach (var project in allProjects)
             {
-                Console.WriteLine($"Project: {project.Key.Name} Status: {project.Key.Status} ");
+                Console.WriteLine($"Projekt: {project.Key.Name} Status: {project.Key.Status} ");
             }
         }
 
@@ -133,12 +133,12 @@ namespace Internship_3_OOP
                 Console.Write($"Unesi {attribute} projekta: ");
                 input = Console.ReadLine();
 
-                if (string.IsNullOrWhiteSpace(input))
+                if (string.IsNullOrEmpty(input))
                 {
                     Console.WriteLine("Ne smije biti empty string! ");
                     continue;
                 }
-                else if(!input.All(char.IsLetter))
+                else if(!input.All(c => char.IsLetter(c) || char.IsWhiteSpace(c)))
                 {
                     Console.WriteLine("Smijes unit samo slova!");
                     continue;
@@ -220,7 +220,7 @@ namespace Internship_3_OOP
                 {
                     if ((task.Deadline - DateTime.Now).TotalDays <= 7)
                     {
-                        Console.WriteLine($"Task: {task.Name} - Deadline: {task.Deadline}, Project: {task.ProjectName.Name }");
+                        Console.WriteLine($"Task: {task.Name} - Rok: {task.Deadline}, Projekt: {task.ProjectName.Name }");
                     }
                 }
             }
@@ -260,7 +260,7 @@ namespace Internship_3_OOP
             {
                 if(project.Key.Status.ToString() == statusAttribute)
                 {
-                    Console.WriteLine($"Project: {project.Key.Name} - Status: {project.Key.Status}");
+                    Console.WriteLine($"Projekt: {project.Key.Name} - Status: {project.Key.Status}");
                 }
             }
         }
@@ -300,7 +300,7 @@ namespace Internship_3_OOP
                 Console.WriteLine($"Zadaci za taj projekt:");
                 foreach (var task in tasks)
                 {
-                    Console.WriteLine($"Task: {task.Name} - {task.Description}, Deadline: {task.Deadline}, Status: {task.Status}");
+                    Console.WriteLine($"Task: {task.Name} - {task.Description}, Rok: {task.Deadline}, Status: {task.Status}");
                 }
             }
 
@@ -308,7 +308,10 @@ namespace Internship_3_OOP
 
         static void PrintProjectDetails(Project pickedProject)
         {
+            Console.Clear();
 
+            Console.WriteLine($"Detaljni prikaz projekta: ");
+            Console.WriteLine($"Ime: {pickedProject.Name}\nOpis: {pickedProject.Description}\nPocetak: {pickedProject.StartOfProject}\nRok: {pickedProject.EndOfProject}\nStatus: {pickedProject.Status}");
         }
     }
 }
