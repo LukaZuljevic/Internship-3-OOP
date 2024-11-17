@@ -125,15 +125,19 @@ namespace Internship_3_OOP
                 var menuSelection = Console.ReadLine();
 
                 Project pickedProject;
+                ProjectTask pickedTask;
 
                 switch (menuSelection)
                 {
                     case "1":
                         pickedProject = PickProject();
-                        var pickedTask = PickTask(pickedProject);
+                        pickedTask = PickTask(pickedProject);
                         PrintTaskDetails(pickedTask);
                         break;
                     case "2":
+                        pickedProject = PickProject();
+                        pickedTask = PickTask(pickedProject);
+                        EditTaskStatus(pickedTask);
                         break;
                     case "3":
                         return;
@@ -150,7 +154,7 @@ namespace Internship_3_OOP
             foreach (var project in allProjects)
             {
                 Console.WriteLine($"Projekt: {project.Key.Name} Status: {project.Key.Status} ");
-                foreach(var task in allProjects[project.Key])
+                foreach (var task in allProjects[project.Key])
                 {
                     Console.WriteLine($"       Task - {task.Name}");
                 }
@@ -432,7 +436,7 @@ namespace Internship_3_OOP
             Console.Write("Unesi ocekivano vrijeme trajanja zadatka(u minutama): ");
             var expectedDurationToFinish = int.Parse(Console.ReadLine());
 
-            while(expectedDurationToFinish <= 0)
+            while (expectedDurationToFinish <= 0)
             {
                 Console.Write("Unesi pozitivan broj: ");
                 expectedDurationToFinish = int.Parse(Console.ReadLine());
@@ -495,9 +499,9 @@ namespace Internship_3_OOP
 
             double timeToFinish = 0;
 
-            foreach(var task in allProjects[pickedProject])
+            foreach (var task in allProjects[pickedProject])
             {
-                if(task.Status.ToString() == "Active")
+                if (task.Status.ToString() == "Active")
                 {
                     timeToFinish += task.ExpectedDuration;
                 }
@@ -514,7 +518,36 @@ namespace Internship_3_OOP
 
         static void PrintTaskDetails(ProjectTask pickedTask)
         {
+            Console.Clear();
             Console.WriteLine($"Task: {pickedTask.Name} - {pickedTask.Description}, Rok: {pickedTask.Deadline}, Status: {pickedTask.Status}");
+        }
+
+        static void EditTaskStatus(ProjectTask pickedTask)
+        {
+            Console.Clear();
+            Console.WriteLine("Novi status zadatka");
+
+            while (true)
+            {
+                Console.WriteLine("1 - Active\n2 - Finished\n3 - Delayed");
+                var statusSelection = Console.ReadLine();
+
+                switch (statusSelection)
+                {
+                    case "1":
+                        pickedTask.Active();
+                        return;
+                    case "2":
+                        pickedTask.Finished();
+                        return;
+                    case "3":
+                        pickedTask.Delayed();
+                        return;
+                    default:
+                        Console.WriteLine("Krivi unos, unesi ponovno!");
+                        break;
+                }
+            }
         }
     }
 }
