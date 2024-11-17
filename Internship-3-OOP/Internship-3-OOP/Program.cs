@@ -34,7 +34,6 @@ namespace Internship_3_OOP
 
         static void MainMenu()
         {
-
             while (true)
             {
                 Console.WriteLine("1 - Ispis svih projekata s pripadajućim zadacima\n2 - Dodavanje novog projekta\n3 - Brisanje projekta\n4 - Prikaz svih zadataka s rokom u sljedećih 7 dana\n5 - Prikaz  projekata filtriranih po status\n6 - Upravljanje pojedinim projektom\n7 - Upravljanje pojedinim zadatkom");
@@ -57,6 +56,39 @@ namespace Internship_3_OOP
                     case "5":
                         FilterProjectsByStatus();
                         break;
+                    case "6":
+                        TaskMenu();
+                        break;
+                    default:
+                        Console.WriteLine("Krivi unos, unesi ponovno!");
+                        break;
+                }
+            }
+        }
+
+        static void TaskMenu()
+        {
+            Console.Clear();
+
+            while (true)
+            {
+                Console.WriteLine("1 - Ispis svih zadataka unutar odabranog projekta\n2 - Prikaz detalja odabranog projekta\n3 - Uređivanje statusa projekta\n4 - Dodavanje zadatka unutar projekta\n5 - Brisanje zadatka iz projekta\n6 - Prikaz ukupno očekivanog vremena potrebnog za sve aktivne zadatke u projektu\n7 - Vrati se na main menu");
+                var menuSelection = Console.ReadLine();
+
+                Project pickedProject;
+
+                switch (menuSelection)
+                {
+                    case "1":
+                        pickedProject = PickProject();
+                        PrintTasksByProject(pickedProject);
+                        break;
+                    case "2":
+                        pickedProject = PickProject();
+                        PrintProjectDetails(pickedProject);
+                        break;
+                    case "7":
+                        return;
                     default:
                         Console.WriteLine("Krivi unos, unesi ponovno!");
                         break;
@@ -71,11 +103,6 @@ namespace Internship_3_OOP
             foreach (var project in allProjects)
             {
                 Console.WriteLine($"Project: {project.Key.Name} Status: {project.Key.Status} ");
-                foreach (var task in project.Value)
-                {
-                    Console.WriteLine($"Task: {task.Name} - Status: {task.Status}, Deadline: {task.Deadline} ");
-                }
-                Console.WriteLine();
             }
         }
 
@@ -236,6 +263,52 @@ namespace Internship_3_OOP
                     Console.WriteLine($"Project: {project.Key.Name} - Status: {project.Key.Status}");
                 }
             }
+        }
+
+        static Project PickProject()
+        {
+            Console.Clear();
+
+            foreach(var project in allProjects)
+            {
+                Console.WriteLine($"Projekt: {project.Key.Name}");
+            }
+
+            string projectPick;
+            Project selectedProject = null;
+
+            do
+            {
+                Console.Write("Unesi projekt kojem zelis vidit zadatke: ");
+                projectPick = Console.ReadLine();
+
+                selectedProject = allProjects.Keys.FirstOrDefault(proj => proj.Name == projectPick);
+
+                if (selectedProject == null)
+                {
+                    Console.WriteLine("Krivi unos, unesi ponovno!");
+                }
+            } while (selectedProject == null);
+
+            return selectedProject;
+        }
+
+        static void PrintTasksByProject(Project pickedProject)
+        {
+            if (allProjects.TryGetValue(pickedProject, out var tasks)) 
+            {
+                Console.WriteLine($"Zadaci za taj projekt:");
+                foreach (var task in tasks)
+                {
+                    Console.WriteLine($"Task: {task.Name} - {task.Description}, Deadline: {task.Deadline}, Status: {task.Status}");
+                }
+            }
+
+        }
+
+        static void PrintProjectDetails(Project pickedProject)
+        {
+
         }
     }
 }
