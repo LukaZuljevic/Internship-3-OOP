@@ -1,6 +1,6 @@
 ﻿namespace Internship_3_OOP.Enum
 {
-    public enum TaskStatus
+    public enum TasksStatus
     {
         Active,
         Finished,

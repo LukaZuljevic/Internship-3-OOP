@@ -1,8 +1,5 @@
-﻿using System;
-using System.Globalization;
-using System.Reflection.Metadata.Ecma335;
+﻿using System.Globalization;
 using Internship_3_OOP.Classes;
-using Internship_3_OOP.Enum;
 
 namespace Internship_3_OOP
 {
@@ -94,6 +91,10 @@ namespace Internship_3_OOP
                     case "4":
                         pickedProject = PickProject();
                         AddTaskToProject(pickedProject);
+                        break;
+                    case "5":
+                        pickedProject = PickProject();
+                        DeleteTaskFromProject(pickedProject);
                         break;
                     case "7":
                         return;
@@ -192,7 +193,7 @@ namespace Internship_3_OOP
 
             foreach (var project in allProjects)
             {
-                if (project.Key.Name == projectToDelete)
+                if (project.Key.Name.ToLower() == projectToDelete.ToLower())
                 {
                     projectFound = true;
 
@@ -248,13 +249,13 @@ namespace Internship_3_OOP
                 {
                     case "1":
                         PrintByStatus("Active");
-                        break;
+                        return;
                     case "2":
                         PrintByStatus("OnHold");
-                        break;
+                        return;
                     case "3":
                         PrintByStatus("Finished");
-                        break;
+                        return;
                     default:
                         Console.WriteLine("Krivi unos, unesi ponovno!");
                         break;
@@ -290,7 +291,7 @@ namespace Internship_3_OOP
                 Console.Write("Unesi jeadn od projekata: ");
                 projectPick = Console.ReadLine();
 
-                selectedProject = allProjects.Keys.FirstOrDefault(proj => proj.Name == projectPick);
+                selectedProject = allProjects.Keys.FirstOrDefault(proj => proj.Name.ToLower() == projectPick.ToLower());
 
                 if (selectedProject == null)
                 {
@@ -373,6 +374,52 @@ namespace Internship_3_OOP
             var newTask = new ProjectTask(taskName, taskDescription, taskDeadline, expectedDurationToFinish, pickedProject);
 
             allProjects[pickedProject].Add(newTask);
+        }
+
+        static void DeleteTaskFromProject(Project pickedProject)
+        {
+            Console.Clear();
+
+            PrintTasksByProject(pickedProject);
+
+            Console.Write("Unesi ime zadatka koji zelis izbrisat: ");
+            var taskToDelete = Console.ReadLine();
+
+            var taskFound = false;
+
+            var tasksToRemove = new List<ProjectTask>();
+
+            foreach (var task in allProjects[pickedProject])
+            {
+                if (task.Name.ToLower() == taskToDelete.ToLower())
+                {
+                    taskFound = true;
+
+                    Console.Write("Jesi li siguran da zelis obrisat ovaj zadatak? (da, ne): ");
+                    var confirmation = Console.ReadLine();
+
+                    while (confirmation != "da" && confirmation != "ne")
+                    {
+                        Console.WriteLine("Krivi unos, unesi da ili ne!");
+                        confirmation = Console.ReadLine();
+                    }
+
+                    if (confirmation == "da")
+                    {
+                        tasksToRemove.Add(task);
+                    }
+                }
+            }
+
+            foreach (var task in tasksToRemove)
+            {
+                allProjects[pickedProject].Remove(task);
+            }
+
+            if (!taskFound)
+            {
+                Console.WriteLine("Taj zadatak ne postoji!");
+            }
         }
     }
 }
