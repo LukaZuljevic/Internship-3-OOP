@@ -87,6 +87,10 @@ namespace Internship_3_OOP
                         pickedProject = PickProject();
                         PrintProjectDetails(pickedProject);
                         break;
+                    case "3":
+                        pickedProject = PickProject();
+                        EditProjectStatus(pickedProject);
+                        break;
                     case "7":
                         return;
                     default:
@@ -114,7 +118,7 @@ namespace Internship_3_OOP
             var projectStart = CheckDate("pocetka");
             var projectDeadline = CheckDate("roka");
 
-            while(DateTime.Compare(projectStart, projectDeadline) >= 0)
+            while (DateTime.Compare(projectStart, projectDeadline) >= 0)
             {
                 Console.WriteLine("Deadline ne moze bit prije pocetka projekta, unesi datum roka ponovno!");
                 projectDeadline = CheckDate("roka");
@@ -122,7 +126,7 @@ namespace Internship_3_OOP
 
             Project newProject = new Project(projectName, projectDescription, projectStart, projectDeadline);
 
-            allProjects.Add(newProject, new List<ProjectTask>()); 
+            allProjects.Add(newProject, new List<ProjectTask>());
         }
 
         static string CheckEmptyStringAndSpecialChars(string attribute)
@@ -138,7 +142,7 @@ namespace Internship_3_OOP
                     Console.WriteLine("Ne smije biti empty string! ");
                     continue;
                 }
-                else if(!input.All(c => char.IsLetter(c) || char.IsWhiteSpace(c)))
+                else if (!input.All(c => char.IsLetter(c) || char.IsWhiteSpace(c)))
                 {
                     Console.WriteLine("Smijes unit samo slova!");
                     continue;
@@ -159,7 +163,7 @@ namespace Internship_3_OOP
                 Console.Write($"Unesi datum {typeOfDate}(yyyy-MM-dd): ");
                 var input = Console.ReadLine();
 
-                if(!DateTime.TryParseExact(input, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out dateOutput))
+                if (!DateTime.TryParseExact(input, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out dateOutput))
                 {
                     Console.WriteLine("Krivi unos, unesi datum u formatu (yyyy-MM-dd)!");
                     continue;
@@ -182,22 +186,22 @@ namespace Internship_3_OOP
 
             var projectFound = false;
 
-            foreach(var project in allProjects)
+            foreach (var project in allProjects)
             {
-                if(project.Key.Name == projectToDelete)
+                if (project.Key.Name == projectToDelete)
                 {
                     projectFound = true;
 
                     Console.Write("Jesi li siguran da zelis obrisat ovaj projekt? (da, ne): ");
                     var confirmation = Console.ReadLine();
 
-                    while(confirmation != "da" && confirmation != "ne")
+                    while (confirmation != "da" && confirmation != "ne")
                     {
                         Console.WriteLine("Krivi unos, unesi da ili ne!");
                         confirmation = Console.ReadLine();
                     }
 
-                    if(confirmation == "da")
+                    if (confirmation == "da")
                     {
                         allProjects.Remove(project.Key);
                     }
@@ -214,13 +218,13 @@ namespace Internship_3_OOP
         {
             Console.Clear();
 
-            foreach(var project in allProjects)
+            foreach (var project in allProjects)
             {
-                foreach(var task in project.Value)
+                foreach (var task in project.Value)
                 {
                     if ((task.Deadline - DateTime.Now).TotalDays <= 7)
                     {
-                        Console.WriteLine($"Task: {task.Name} - Rok: {task.Deadline}, Projekt: {task.ProjectName.Name }");
+                        Console.WriteLine($"Task: {task.Name} - Rok: {task.Deadline}, Projekt: {task.ProjectName.Name}");
                     }
                 }
             }
@@ -233,7 +237,7 @@ namespace Internship_3_OOP
             Console.WriteLine("Unesi status za ispis svih projekata s istim statusom");
             while (true)
             {
-                Console.WriteLine("1 - Aktivni\n2 - Na cekanju\n3 - Zavrseni");
+                Console.WriteLine("1 - Active\n2 - On hold\n3 - Finished");
                 var statusSelection = Console.ReadLine();
 
                 switch (statusSelection)
@@ -256,9 +260,9 @@ namespace Internship_3_OOP
 
         static void PrintByStatus(string statusAttribute)
         {
-            foreach(var project in allProjects)
+            foreach (var project in allProjects)
             {
-                if(project.Key.Status.ToString() == statusAttribute)
+                if (project.Key.Status.ToString() == statusAttribute)
                 {
                     Console.WriteLine($"Projekt: {project.Key.Name} - Status: {project.Key.Status}");
                 }
@@ -269,7 +273,7 @@ namespace Internship_3_OOP
         {
             Console.Clear();
 
-            foreach(var project in allProjects)
+            foreach (var project in allProjects)
             {
                 Console.WriteLine($"Projekt: {project.Key.Name}");
             }
@@ -279,7 +283,7 @@ namespace Internship_3_OOP
 
             do
             {
-                Console.Write("Unesi projekt kojem zelis vidit zadatke: ");
+                Console.Write("Unesi jeadn od projekata: ");
                 projectPick = Console.ReadLine();
 
                 selectedProject = allProjects.Keys.FirstOrDefault(proj => proj.Name == projectPick);
@@ -295,7 +299,7 @@ namespace Internship_3_OOP
 
         static void PrintTasksByProject(Project pickedProject)
         {
-            if (allProjects.TryGetValue(pickedProject, out var tasks)) 
+            if (allProjects.TryGetValue(pickedProject, out var tasks))
             {
                 Console.WriteLine($"Zadaci za taj projekt:");
                 foreach (var task in tasks)
@@ -312,6 +316,34 @@ namespace Internship_3_OOP
 
             Console.WriteLine($"Detaljni prikaz projekta: ");
             Console.WriteLine($"Ime: {pickedProject.Name}\nOpis: {pickedProject.Description}\nPocetak: {pickedProject.StartOfProject}\nRok: {pickedProject.EndOfProject}\nStatus: {pickedProject.Status}");
+        }
+
+        static void EditProjectStatus(Project pickedProject)
+        {
+            Console.Clear();
+            Console.WriteLine("Novi status projekta");
+
+            while (true)
+            {
+                Console.WriteLine("1 - Active\n2 - On hold\n3 - Finished");
+                var statusSelection = Console.ReadLine();
+
+                switch (statusSelection)
+                {
+                    case "1":
+                        pickedProject.Active();
+                        return;
+                    case "2":
+                        pickedProject.OnHold();
+                        return;
+                    case "3":
+                        pickedProject.Finished();
+                        return;
+                    default:
+                        Console.WriteLine("Krivi unos, unesi ponovno!");
+                        break;
+                }
+            }
         }
     }
 }
