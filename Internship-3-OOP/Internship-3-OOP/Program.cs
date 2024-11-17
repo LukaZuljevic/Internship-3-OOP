@@ -14,11 +14,13 @@ namespace Internship_3_OOP
             var testProject3 = new Project("Projekt C", "Treci test projekt", new DateTime(2024, 11, 10), new DateTime(2025, 1, 31));
 
             var testTask1 = new ProjectTask("Dizajn pocetne stranice", "Izrada dizajna", new DateTime(2024, 11, 20), 10000, testProject1);
+            testTask1.Finished();
             var testTask2 = new ProjectTask("Implementacija featurea", "Novi feature", new DateTime(2024, 12, 15), 12000, testProject1);
             var testTask3 = new ProjectTask("Projektna specifikacija", "Izrada detaljne specifikacije za projekt", new DateTime(2024, 11, 23), 8000, testProject2);
             var testTask4 = new ProjectTask("Planiranje projekta", "Postavljanje planova i ciljeva", new DateTime(2024, 11, 15), 7000, testProject3);
             var testTask5 = new ProjectTask("Kodiranje modula", "Implementacija osnovnih funkcionalnosti", new DateTime(2024, 12, 5), 15000, testProject3);
             var testTask6 = new ProjectTask("Testiranje sustava", "Testiranje svih komponenti", new DateTime(2025, 1, 20), 9000, testProject3);
+            testTask6.Delayed();
 
             allProjects[testProject1] = new List<ProjectTask> { testTask1, testTask2 };
             allProjects[testProject2] = new List<ProjectTask> { testTask3 };
@@ -95,6 +97,10 @@ namespace Internship_3_OOP
                     case "5":
                         pickedProject = PickProject();
                         DeleteTaskFromProject(pickedProject);
+                        break;
+                    case "6":
+                        pickedProject = PickProject();
+                        TimeToFinishTasks(pickedProject);
                         break;
                     case "7":
                         return;
@@ -420,6 +426,27 @@ namespace Internship_3_OOP
             {
                 Console.WriteLine("Taj zadatak ne postoji!");
             }
+        }
+
+        static void TimeToFinishTasks(Project pickedProject)
+        {
+            double timeToFinish = 0;
+
+            foreach(var task in allProjects[pickedProject])
+            {
+                if(task.Status.ToString() == "Active")
+                {
+                    timeToFinish += task.ExpectedDuration;
+                }
+            }
+
+            TimeSpan timeSpan = TimeSpan.FromMinutes(timeToFinish);
+
+            int days = timeSpan.Days;
+            int hours = timeSpan.Hours;
+            int remainingMinutes = timeSpan.Minutes;
+
+            Console.WriteLine($"Time to finish: {days} days, {hours} hours, and {remainingMinutes} minutes.");
         }
     }
 }

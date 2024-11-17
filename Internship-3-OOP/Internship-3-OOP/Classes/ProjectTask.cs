@@ -25,7 +25,7 @@ namespace Internship_3_OOP.Classes
             Status = TasksStatus.Active;
         }
 
-        public void Fnished()
+        public void Finished()
         {
             Status = TasksStatus.Finished;
         }
