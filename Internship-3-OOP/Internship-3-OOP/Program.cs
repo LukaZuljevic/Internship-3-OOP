@@ -17,7 +17,7 @@ namespace Internship_3_OOP
 
             var testTask1 = new ProjectTask("Dizajn pocetne stranice", "Izrada dizajna", new DateTime(2024, 11, 20), 10000, testProject1);
             var testTask2 = new ProjectTask("Implementacija featurea", "Novi feature", new DateTime(2024, 12, 15), 12000, testProject1);
-            var testTask3 = new ProjectTask("Projektna specifikacija", "Izrada detaljne specifikacije za projekt", new DateTime(2024, 11, 25), 8000, testProject2);
+            var testTask3 = new ProjectTask("Projektna specifikacija", "Izrada detaljne specifikacije za projekt", new DateTime(2024, 11, 23), 8000, testProject2);
 
             allProjects[testProject1] = new List<ProjectTask> { testTask1, testTask2 };
             allProjects[testProject2] = new List<ProjectTask> { testTask3 };
@@ -43,6 +43,9 @@ namespace Internship_3_OOP
                         break;
                     case "3":
                         DeleteProject();
+                        break;
+                    case "4":
+                        SevenDayDeadlineTasks();
                         break;
                     default:
                         Console.WriteLine("Krivi unos, unesi ponovno!");
@@ -167,6 +170,22 @@ namespace Internship_3_OOP
             if (!projectFound)
             {
                 Console.WriteLine("Taj projekt ne postoji!");
+            }
+        }
+
+        static void SevenDayDeadlineTasks()
+        {
+            Console.Clear();
+
+            foreach(var project in allProjects)
+            {
+                foreach(var task in project.Value)
+                {
+                    if ((task.Deadline - DateTime.Now).TotalDays <= 7)
+                    {
+                        Console.WriteLine($"Task: {task.Name} - Deadline: {task.Deadline}, Project: {task.ProjectName.Name }");
+                    }
+                }
             }
         }
     }
