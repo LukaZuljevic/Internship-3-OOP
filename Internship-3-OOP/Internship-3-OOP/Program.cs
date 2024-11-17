@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Net.WebSockets;
 using Internship_3_OOP.Classes;
 
 namespace Internship_3_OOP
@@ -58,6 +59,9 @@ namespace Internship_3_OOP
                     case "6":
                         ProjectMenu();
                         break;
+                    case "7":
+                        TaskMenu();
+                        break;
                     default:
                         Console.WriteLine("Krivi unos, unesi ponovno!");
                         break;
@@ -111,6 +115,34 @@ namespace Internship_3_OOP
             }
         }
 
+        static void TaskMenu()
+        {
+            Console.Clear();
+
+            while (true)
+            {
+                Console.WriteLine("1 - Prikaz detalja odabranog zadatka\n2 - Uređivanje statusa zadatka\n3 - Vrati se na main menu");
+                var menuSelection = Console.ReadLine();
+
+                Project pickedProject;
+
+                switch (menuSelection)
+                {
+                    case "1":
+                        pickedProject = PickProject();
+                        var pickedTask = PickTask(pickedProject);
+                        PrintTaskDetails(pickedTask);
+                        break;
+                    case "2":
+                        break;
+                    case "3":
+                        return;
+                    default:
+                        Console.WriteLine("Krivi unos, unesi ponovno!");
+                        break;
+                }
+            }
+        }
         static void PrintAllProjects()
         {
             Console.Clear();
@@ -118,6 +150,10 @@ namespace Internship_3_OOP
             foreach (var project in allProjects)
             {
                 Console.WriteLine($"Projekt: {project.Key.Name} Status: {project.Key.Status} ");
+                foreach(var task in allProjects[project.Key])
+                {
+                    Console.WriteLine($"       Task - {task.Name}");
+                }
             }
         }
 
@@ -308,6 +344,31 @@ namespace Internship_3_OOP
             return selectedProject;
         }
 
+        static ProjectTask PickTask(Project pickedProject)
+        {
+            Console.Clear();
+
+            PrintTasksByProject(pickedProject);
+
+            string taskPick;
+            ProjectTask selectedTask = null;
+
+            do
+            {
+                Console.Write("Unesi jeadn od zadataka: ");
+                taskPick = Console.ReadLine();
+
+                selectedTask = allProjects[pickedProject].FirstOrDefault(task => task.Name.ToLower() == taskPick.ToLower());
+
+                if (selectedTask == null)
+                {
+                    Console.WriteLine("Krivi unos, unesi ponovno!");
+                }
+            } while (selectedTask == null);
+
+            return selectedTask;
+        }
+
         static void PrintTasksByProject(Project pickedProject)
         {
             if (allProjects.TryGetValue(pickedProject, out var tasks))
@@ -315,7 +376,7 @@ namespace Internship_3_OOP
                 Console.WriteLine($"Zadaci za taj projekt:");
                 foreach (var task in tasks)
                 {
-                    Console.WriteLine($"Task: {task.Name} - {task.Description}, Rok: {task.Deadline}, Status: {task.Status}");
+                    Console.WriteLine($"Task: {task.Name} - {task.Description}");
                 }
             }
 
@@ -430,6 +491,8 @@ namespace Internship_3_OOP
 
         static void TimeToFinishTasks(Project pickedProject)
         {
+            Console.Clear();
+
             double timeToFinish = 0;
 
             foreach(var task in allProjects[pickedProject])
@@ -447,6 +510,11 @@ namespace Internship_3_OOP
             int remainingMinutes = timeSpan.Minutes;
 
             Console.WriteLine($"Time to finish: {days} days, {hours} hours, and {remainingMinutes} minutes.");
+        }
+
+        static void PrintTaskDetails(ProjectTask pickedTask)
+        {
+            Console.WriteLine($"Task: {pickedTask.Name} - {pickedTask.Description}, Rok: {pickedTask.Deadline}, Status: {pickedTask.Status}");
         }
     }
 }
