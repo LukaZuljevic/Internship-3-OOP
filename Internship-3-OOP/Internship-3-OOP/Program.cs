@@ -36,7 +36,7 @@ namespace Internship_3_OOP
         {
             while (true)
             {
-                Console.WriteLine("1 - Ispis svih projekata s pripadajućim zadacima\n2 - Dodavanje novog projekta\n3 - Brisanje projekta\n4 - Prikaz svih zadataka s rokom u sljedećih 7 dana\n5 - Prikaz  projekata filtriranih po status\n6 - Upravljanje pojedinim projektom\n7 - Upravljanje pojedinim zadatkom");
+                Console.WriteLine("1 - Ispis svih projekata\n2 - Dodavanje novog projekta\n3 - Brisanje projekta\n4 - Prikaz svih zadataka s rokom u sljedećih 7 dana\n5 - Prikaz  projekata filtriranih po status\n6 - Upravljanje pojedinim projektom\n7 - Upravljanje pojedinim zadatkom");
                 var menuSelection = Console.ReadLine();
 
                 switch (menuSelection)
@@ -57,7 +57,7 @@ namespace Internship_3_OOP
                         FilterProjectsByStatus();
                         break;
                     case "6":
-                        TaskMenu();
+                        ProjectMenu();
                         break;
                     default:
                         Console.WriteLine("Krivi unos, unesi ponovno!");
@@ -66,7 +66,7 @@ namespace Internship_3_OOP
             }
         }
 
-        static void TaskMenu()
+        static void ProjectMenu()
         {
             Console.Clear();
 
@@ -91,6 +91,10 @@ namespace Internship_3_OOP
                         pickedProject = PickProject();
                         EditProjectStatus(pickedProject);
                         break;
+                    case "4":
+                        pickedProject = PickProject();
+                        AddTaskToProject(pickedProject);
+                        break;
                     case "7":
                         return;
                     default:
@@ -112,8 +116,8 @@ namespace Internship_3_OOP
 
         static void AddProject()
         {
-            var projectName = CheckEmptyStringAndSpecialChars("ime");
-            var projectDescription = CheckEmptyStringAndSpecialChars("opis");
+            var projectName = CheckEmptyStringAndSpecialChars("ime", "projekta");
+            var projectDescription = CheckEmptyStringAndSpecialChars("opis", "projekta");
 
             var projectStart = CheckDate("pocetka");
             var projectDeadline = CheckDate("roka");
@@ -129,12 +133,12 @@ namespace Internship_3_OOP
             allProjects.Add(newProject, new List<ProjectTask>());
         }
 
-        static string CheckEmptyStringAndSpecialChars(string attribute)
+        static string CheckEmptyStringAndSpecialChars(string attribute, string entity)
         {
             var input = string.Empty;
             while (true)
             {
-                Console.Write($"Unesi {attribute} projekta: ");
+                Console.Write($"Unesi {attribute} {entity}: ");
                 input = Console.ReadLine();
 
                 if (string.IsNullOrEmpty(input))
@@ -344,6 +348,31 @@ namespace Internship_3_OOP
                         break;
                 }
             }
+        }
+
+        static void AddTaskToProject(Project pickedProject)
+        {
+            Console.Clear();
+
+            Console.WriteLine("Dodaj zadatak unutar odabranog projekta");
+
+            var taskName = CheckEmptyStringAndSpecialChars("ime", "zadatka");
+            var taskDescription = CheckEmptyStringAndSpecialChars("opis", "zadatka");
+
+            var taskDeadline = CheckDate("rok");
+
+            Console.Write("Unesi ocekivano vrijeme trajanja zadatka(u minutama): ");
+            var expectedDurationToFinish = int.Parse(Console.ReadLine());
+
+            while(expectedDurationToFinish <= 0)
+            {
+                Console.Write("Unesi pozitivan broj: ");
+                expectedDurationToFinish = int.Parse(Console.ReadLine());
+            }
+
+            var newTask = new ProjectTask(taskName, taskDescription, taskDeadline, expectedDurationToFinish, pickedProject);
+
+            allProjects[pickedProject].Add(newTask);
         }
     }
 }
