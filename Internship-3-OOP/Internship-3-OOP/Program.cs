@@ -1,5 +1,4 @@
 ﻿using System.Globalization;
-using System.Net.WebSockets;
 using Internship_3_OOP.Classes;
 
 namespace Internship_3_OOP
@@ -13,6 +12,7 @@ namespace Internship_3_OOP
             var testProject1 = new Project("Projekt A", "Prvi test projekt", new DateTime(2024, 11, 1), new DateTime(2024, 12, 31));
             var testProject2 = new Project("Projekt B", "Drugi test projekt", new DateTime(2024, 10, 1), new DateTime(2024, 11, 30));
             var testProject3 = new Project("Projekt C", "Treci test projekt", new DateTime(2024, 11, 10), new DateTime(2025, 1, 31));
+            testProject3.OnHold();
 
             var testTask1 = new ProjectTask("Dizajn pocetne stranice", "Izrada dizajna", new DateTime(2024, 11, 20), 10000, testProject1);
             testTask1.Finished();
@@ -26,8 +26,6 @@ namespace Internship_3_OOP
             allProjects[testProject1] = new List<ProjectTask> { testTask1, testTask2 };
             allProjects[testProject2] = new List<ProjectTask> { testTask3 };
             allProjects[testProject3] = new List<ProjectTask> { testTask4, testTask5, testTask6 };
-
-            testProject3.OnHold();
 
             MainMenu();
         }
@@ -138,6 +136,7 @@ namespace Internship_3_OOP
                         pickedProject = PickProject();
                         pickedTask = PickTask(pickedProject);
                         EditTaskStatus(pickedTask);
+                        ProjectIsFinished(pickedProject);//provjerava jesu svi zadaci finished -> ako jesu projekt se stavlja pod finished isto
                         break;
                     case "3":
                         return;
@@ -147,6 +146,7 @@ namespace Internship_3_OOP
                 }
             }
         }
+
         static void PrintAllProjects()
         {
             Console.Clear();
@@ -164,6 +164,14 @@ namespace Internship_3_OOP
         static void AddProject()
         {
             var projectName = CheckEmptyStringAndSpecialChars("ime", "projekta");
+
+            while(IsProjectNameDuplicate(allProjects, projectName))
+            {
+                Console.WriteLine("Ime projekta vec postoji!");
+                projectName = CheckEmptyStringAndSpecialChars("ime", "projekta");
+                IsProjectNameDuplicate(allProjects, projectName);
+            }
+
             var projectDescription = CheckEmptyStringAndSpecialChars("opis", "projekta");
 
             var projectStart = CheckDate("pocetka");
@@ -180,13 +188,25 @@ namespace Internship_3_OOP
             allProjects.Add(newProject, new List<ProjectTask>());
         }
 
+        static bool IsProjectNameDuplicate(Dictionary<Project, List<ProjectTask>> allProjects, string projectName)
+        {
+            foreach (var project in allProjects.Keys)
+            {
+                if (string.Equals(project.Name, projectName, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         static string CheckEmptyStringAndSpecialChars(string attribute, string entity)
         {
             var input = string.Empty;
             while (true)
             {
                 Console.Write($"Unesi {attribute} {entity}: ");
-                input = Console.ReadLine();
+                input = Console.ReadLine().Trim();
 
                 if (string.IsNullOrEmpty(input))
                 {
@@ -375,6 +395,7 @@ namespace Internship_3_OOP
 
         static void PrintTasksByProject(Project pickedProject)
         {
+            Console.Clear();
             if (allProjects.TryGetValue(pickedProject, out var tasks))
             {
                 Console.WriteLine($"Zadaci za taj projekt:");
@@ -397,6 +418,13 @@ namespace Internship_3_OOP
         static void EditProjectStatus(Project pickedProject)
         {
             Console.Clear();
+
+            if (pickedProject.Status.ToString() == "Finished")
+            {
+                Console.WriteLine("Cannot edit finished project");
+                return;
+            }
+                
             Console.WriteLine("Novi status projekta");
 
             while (true)
@@ -426,9 +454,23 @@ namespace Internship_3_OOP
         {
             Console.Clear();
 
+            if (pickedProject.Status.ToString() == "Finished")
+            {
+                Console.WriteLine("Cannot edit finished project");
+                return;
+            }
+
             Console.WriteLine("Dodaj zadatak unutar odabranog projekta");
 
             var taskName = CheckEmptyStringAndSpecialChars("ime", "zadatka");
+
+            while (IsTaskNameDuplicate(allProjects[pickedProject], taskName))
+            {
+                Console.WriteLine("Ime zadatka vec postoji!");
+                taskName = CheckEmptyStringAndSpecialChars("ime", "zadatka");
+                IsTaskNameDuplicate(allProjects[pickedProject], taskName);
+            }
+
             var taskDescription = CheckEmptyStringAndSpecialChars("opis", "zadatka");
 
             var taskDeadline = CheckDate("rok");
@@ -447,9 +489,27 @@ namespace Internship_3_OOP
             allProjects[pickedProject].Add(newTask);
         }
 
+        static bool IsTaskNameDuplicate(List<ProjectTask> pickedProjectTasks, string taskName)
+        {
+            foreach(var task in pickedProjectTasks)
+            {
+                if(string.Equals(task.Name, taskName , StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         static void DeleteTaskFromProject(Project pickedProject)
         {
             Console.Clear();
+
+            if (pickedProject.Status.ToString() == "Finished")
+            {
+                Console.WriteLine("Cannot edit finished task");
+                return;
+            }
 
             PrintTasksByProject(pickedProject);
 
@@ -525,6 +585,13 @@ namespace Internship_3_OOP
         static void EditTaskStatus(ProjectTask pickedTask)
         {
             Console.Clear();
+
+            if (pickedTask.Status.ToString() == "Finished")
+            {
+                Console.WriteLine("Cannot edit finished task");
+                return;
+            }
+
             Console.WriteLine("Novi status zadatka");
 
             while (true)
@@ -547,6 +614,22 @@ namespace Internship_3_OOP
                         Console.WriteLine("Krivi unos, unesi ponovno!");
                         break;
                 }
+            }
+        }
+
+        static void ProjectIsFinished(Project project)
+        {
+            if (allProjects.TryGetValue(project, out var tasks))
+            {
+                foreach (var task in tasks)
+                {
+                    if(task.Status.ToString() != "Finished")
+                    {
+                        return;
+                    }
+                }
+
+                project.Finished();
             }
         }
     }
