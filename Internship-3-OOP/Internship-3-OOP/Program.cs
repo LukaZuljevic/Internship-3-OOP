@@ -343,12 +343,18 @@ namespace Internship_3_OOP
 
         static void PrintByStatus(string statusAttribute)
         {
+            var isEmpty = true;
             foreach (var project in allProjects)
             {
                 if (project.Key.Status.ToString() == statusAttribute)
                 {
+                    isEmpty = false;
                     Console.WriteLine($"Projekt: {project.Key.Name} - Status: {project.Key.Status}");
                 }
+            }
+            if (isEmpty)
+            {
+                Console.WriteLine("Nema projekata sa takvim statusom!");
             }
         }
 
@@ -413,7 +419,7 @@ namespace Internship_3_OOP
                 Console.WriteLine($"Zadaci za taj projekt:");
                 foreach (var task in tasks)
                 {
-                    Console.WriteLine($"Task: {task.Name} - {task.Description}");
+                    Console.WriteLine($"Task: {task.Name} - {task.Description}, Status: {task.Status}");
                 }
             }
 
@@ -436,7 +442,7 @@ namespace Internship_3_OOP
                 Console.WriteLine("Cannot edit finished project");
                 return;
             }
-                
+            Console.WriteLine("(Upozorenje)Ako oznacis projekt kao finished, automatski ce se svi zadaci unutar projekta oznacit kao finished\n");    
             Console.WriteLine("Novi status projekta");
 
             while (true)
@@ -454,6 +460,15 @@ namespace Internship_3_OOP
                         return;
                     case "3":
                         pickedProject.Finished();
+
+                        foreach(var task in allProjects[pickedProject])
+                        {
+                            if(task.Status.ToString() != "Finished")
+                            {
+                                task.Finished();
+                            }
+                        }
+
                         return;
                     default:
                         Console.WriteLine("Krivi unos, unesi ponovno!");
