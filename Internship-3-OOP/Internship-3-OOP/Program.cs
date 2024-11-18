@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Net.WebSockets;
 using Internship_3_OOP.Classes;
 
 namespace Internship_3_OOP
@@ -17,9 +18,12 @@ namespace Internship_3_OOP
             var testTask1 = new ProjectTask("Dizajn pocetne stranice", "Izrada dizajna", new DateTime(2024, 11, 20), 10000, testProject1);
             testTask1.Finished();
             var testTask2 = new ProjectTask("Implementacija featurea", "Novi feature", new DateTime(2024, 12, 15), 12000, testProject1);
+            testTask2.LowPriority();
             var testTask3 = new ProjectTask("Projektna specifikacija", "Izrada detaljne specifikacije za projekt", new DateTime(2024, 11, 23), 8000, testProject2);
             var testTask4 = new ProjectTask("Planiranje projekta", "Postavljanje planova i ciljeva", new DateTime(2024, 11, 15), 7000, testProject3);
+            testTask4.MediumPriority();
             var testTask5 = new ProjectTask("Kodiranje modula", "Implementacija osnovnih funkcionalnosti", new DateTime(2024, 12, 5), 15000, testProject3);
+            testTask5.LowPriority();
             var testTask6 = new ProjectTask("Testiranje sustava", "Testiranje svih komponenti", new DateTime(2025, 1, 20), 9000, testProject3);
             testTask6.Delayed();
 
@@ -73,7 +77,7 @@ namespace Internship_3_OOP
 
             while (true)
             {
-                Console.WriteLine("1 - Ispis svih zadataka unutar odabranog projekta\n2 - Prikaz detalja odabranog projekta\n3 - Uređivanje statusa projekta\n4 - Dodavanje zadatka unutar projekta\n5 - Brisanje zadatka iz projekta\n6 - Prikaz ukupno očekivanog vremena potrebnog za sve aktivne zadatke u projektu\n7 - Prikaz svih zadataka po duljini trajanja\n8 - Vrati se na main menu");
+                Console.WriteLine("1 - Ispis svih zadataka unutar odabranog projekta\n2 - Prikaz detalja odabranog projekta\n3 - Uređivanje statusa projekta\n4 - Dodavanje zadatka unutar projekta\n5 - Brisanje zadatka iz projekta\n6 - Prikaz ukupno očekivanog vremena potrebnog za sve aktivne zadatke u projektu\n7 - Prikaz zadataka po duljini trajanja\n8 - Prikaz zadatka sortirani po prioritetu\n9 - Vrati se na main menu");
                 var menuSelection = Console.ReadLine();
 
                 Project pickedProject;
@@ -109,6 +113,10 @@ namespace Internship_3_OOP
                         SortTasksByDuration(pickedProject);
                         break;
                     case "8":
+                        pickedProject = PickProject();
+                        SortTasksByPriority(pickedProject);
+                        break;
+                    case "9":
                         return;
                     default:
                         Console.WriteLine("Krivi unos, unesi ponovno!");
@@ -639,6 +647,8 @@ namespace Internship_3_OOP
 
         static void SortTasksByDuration(Project pickedProject)
         {
+            Console.Clear();
+
             var sortedTasks = allProjects[pickedProject].OrderBy(t => t.ExpectedDuration).ToList();
 
             foreach(var task in sortedTasks)
@@ -650,6 +660,32 @@ namespace Internship_3_OOP
                 int remainingMinutes = timeSpan.Minutes;
 
                 Console.WriteLine($"{task.Name} - {task.Description}, Ocekivano trajanje:  {days} dana, {hours} sati i {remainingMinutes} minuta");
+            }
+        }
+
+        static void SortTasksByPriority(Project pickedProject)
+        {
+            Console.Clear();
+            var highPriorityTasks = allProjects[pickedProject].Where(t => t.Priority.ToString() == "High");
+            var mediumPriorityTasks = allProjects[pickedProject].Where(t => t.Priority.ToString() == "Medium");
+            var lowPriorityTasks = allProjects[pickedProject].Where(t => t.Priority.ToString() == "Low");
+
+            Console.WriteLine("High Priority Tasks:");
+            foreach (var task in highPriorityTasks)
+            {
+                Console.WriteLine($"Task: {task.Name}, Expected Duration: {task.ExpectedDuration}");
+            }
+
+            Console.WriteLine("\nMedium Priority Tasks:");
+            foreach (var task in mediumPriorityTasks)
+            {
+                Console.WriteLine($"Task: {task.Name}, Expected Duration: {task.ExpectedDuration}");
+            }
+
+            Console.WriteLine("\nLow Priority Tasks:");
+            foreach (var task in lowPriorityTasks)
+            {
+                Console.WriteLine($"Task: {task.Name}, Expected Duration: {task.ExpectedDuration}");
             }
         }
     }

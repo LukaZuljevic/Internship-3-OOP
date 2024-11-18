@@ -8,6 +8,7 @@ namespace Internship_3_OOP.Classes
         public string Description { get; set; }
         public DateTime Deadline { get; set; }
         public TasksStatus Status;
+        public TaskPriority Priority;
         public int ExpectedDuration { get; set; }
         public Project ProjectName { get; set; }
 
@@ -33,6 +34,21 @@ namespace Internship_3_OOP.Classes
         public void Delayed()
         {
             Status = TasksStatus.Delayed;
+        }
+
+        public void HighPriority()
+        {
+            Priority = TaskPriority.High;
+        }
+
+        public void MediumPriority()
+        {
+            Priority = TaskPriority.Medium;
+        }
+
+        public void LowPriority()
+        {
+            Priority = TaskPriority.Low;
         }
     }
 }
