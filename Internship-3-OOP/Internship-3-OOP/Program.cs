@@ -73,7 +73,7 @@ namespace Internship_3_OOP
 
             while (true)
             {
-                Console.WriteLine("1 - Ispis svih zadataka unutar odabranog projekta\n2 - Prikaz detalja odabranog projekta\n3 - Uređivanje statusa projekta\n4 - Dodavanje zadatka unutar projekta\n5 - Brisanje zadatka iz projekta\n6 - Prikaz ukupno očekivanog vremena potrebnog za sve aktivne zadatke u projektu\n7 - Vrati se na main menu");
+                Console.WriteLine("1 - Ispis svih zadataka unutar odabranog projekta\n2 - Prikaz detalja odabranog projekta\n3 - Uređivanje statusa projekta\n4 - Dodavanje zadatka unutar projekta\n5 - Brisanje zadatka iz projekta\n6 - Prikaz ukupno očekivanog vremena potrebnog za sve aktivne zadatke u projektu\n7 - Prikaz svih zadataka po duljini trajanja\n8 - Vrati se na main menu");
                 var menuSelection = Console.ReadLine();
 
                 Project pickedProject;
@@ -105,6 +105,10 @@ namespace Internship_3_OOP
                         TimeToFinishTasks(pickedProject);
                         break;
                     case "7":
+                        pickedProject = PickProject();
+                        SortTasksByDuration(pickedProject);
+                        break;
+                    case "8":
                         return;
                     default:
                         Console.WriteLine("Krivi unos, unesi ponovno!");
@@ -630,6 +634,22 @@ namespace Internship_3_OOP
                 }
 
                 project.Finished();
+            }
+        }
+
+        static void SortTasksByDuration(Project pickedProject)
+        {
+            var sortedTasks = allProjects[pickedProject].OrderBy(t => t.ExpectedDuration).ToList();
+
+            foreach(var task in sortedTasks)
+            {
+                TimeSpan timeSpan = TimeSpan.FromMinutes(task.ExpectedDuration);
+
+                int days = timeSpan.Days;
+                int hours = timeSpan.Hours;
+                int remainingMinutes = timeSpan.Minutes;
+
+                Console.WriteLine($"{task.Name} - {task.Description}, Ocekivano trajanje:  {days} dana, {hours} sati i {remainingMinutes} minuta");
             }
         }
     }
