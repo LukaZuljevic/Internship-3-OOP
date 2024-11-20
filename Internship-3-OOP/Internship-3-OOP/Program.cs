@@ -620,18 +620,15 @@ namespace Internship_3_OOP
 
         static void IsProjectFinished(Project project)
         {
-            if (allProjects.TryGetValue(project, out var tasks))
+            foreach (var task in allProjects[project])
             {
-                foreach (var task in tasks)
+                if (task.Status.ToString() != "Finished")
                 {
-                    if(task.Status.ToString() != "Finished")
-                    {
-                        return;
-                    }
+                    return;
                 }
-
-                project.Finished();
             }
+
+            project.Finished();
         }
 
         static void SortTasksByDuration(Project pickedProject)
