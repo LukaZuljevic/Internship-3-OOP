@@ -148,7 +148,7 @@ namespace Internship_3_OOP
                         pickedProject = PickProject();
                         pickedTask = PickTask(pickedProject);
                         EditTaskStatus(pickedTask);
-                        ProjectIsFinished(pickedProject);//provjerava jesu svi zadaci finished -> ako jesu projekt se stavlja pod finished isto
+                        IsProjectFinished(pickedProject);//provjerava jesu svi zadaci finished -> ako jesu projekt se stavlja pod finished isto
                         break;
                     case "3":
                         return;
@@ -165,27 +165,31 @@ namespace Internship_3_OOP
 
             foreach (var project in allProjects)
             {
-                Console.WriteLine($"Projekt: {project.Key.Name} Status: {project.Key.Status} ");
-                foreach (var task in allProjects[project.Key])
+                Console.WriteLine($"Ime: {project.Key.Name} Status: {project.Key.Status} ");
+                foreach (var task in project.Value)
                 {
                     Console.WriteLine($"       Task - {task.Name}");
                 }
+                Console.WriteLine();
             }
+            Console.WriteLine();
         }
 
         static void AddProject()
         {
+            Console.Clear();
+
             var projectName = CheckEmptyStringAndSpecialChars("ime", "projekta");
 
-            while(IsProjectNameDuplicate(allProjects, projectName))
+            while(IsProjectNameDuplicate(projectName))
             {
                 Console.WriteLine("Ime projekta vec postoji!");
+
                 projectName = CheckEmptyStringAndSpecialChars("ime", "projekta");
-                IsProjectNameDuplicate(allProjects, projectName);
+                IsProjectNameDuplicate(projectName);
             }
 
             var projectDescription = CheckEmptyStringAndSpecialChars("opis", "projekta");
-
             var projectStart = CheckDate("pocetka");
             var projectDeadline = CheckDate("roka");
 
@@ -198,16 +202,17 @@ namespace Internship_3_OOP
             Project newProject = new Project(projectName, projectDescription, projectStart, projectDeadline);
 
             allProjects.Add(newProject, new List<ProjectTask>());
+
+            Console.WriteLine("Projekt uspjesno dodan!\n");
         }
 
-        static bool IsProjectNameDuplicate(Dictionary<Project, List<ProjectTask>> allProjects, string projectName)
+        static bool IsProjectNameDuplicate(string projectName)
         {
             foreach (var project in allProjects.Keys)
             {
                 if (string.Equals(project.Name, projectName, StringComparison.OrdinalIgnoreCase))
-                {
                     return true;
-                }
+                
             }
             return false;
         }
@@ -271,7 +276,7 @@ namespace Internship_3_OOP
 
             foreach (var project in allProjects)
             {
-                if (project.Key.Name.ToLower() == projectToDelete.ToLower())
+                if (string.Equals(project.Key.Name, projectToDelete, StringComparison.OrdinalIgnoreCase))
                 {
                     projectFound = true;
 
@@ -285,16 +290,12 @@ namespace Internship_3_OOP
                     }
 
                     if (confirmation == "da")
-                    {
                         allProjects.Remove(project.Key);
-                    }
                 }
             }
 
-            if (!projectFound)
-            {
-                Console.WriteLine("Taj projekt ne postoji!");
-            }
+            if(!projectFound)
+                Console.WriteLine("Taj projekt ne postoji!\n");
         }
 
         static void SevenDayDeadlineTasks()
@@ -306,11 +307,10 @@ namespace Internship_3_OOP
                 foreach (var task in project.Value)
                 {
                     if ((task.Deadline - DateTime.Now).TotalDays <= 7)
-                    {
-                        Console.WriteLine($"Task: {task.Name} - Rok: {task.Deadline}, Projekt: {task.ProjectName.Name}");
-                    }
+                        Console.WriteLine($"Task: {task.Name} - Rok: {task.Deadline}, Projekt: {task.ProjectName.Name}\n");
                 }
             }
+            Console.WriteLine();
         }
 
         static void FilterProjectsByStatus()
@@ -343,19 +343,19 @@ namespace Internship_3_OOP
 
         static void PrintByStatus(string statusAttribute)
         {
+            Console.Clear();
+
             var isEmpty = true;
             foreach (var project in allProjects)
             {
                 if (project.Key.Status.ToString() == statusAttribute)
                 {
                     isEmpty = false;
-                    Console.WriteLine($"Projekt: {project.Key.Name} - Status: {project.Key.Status}");
+                    Console.WriteLine($"Ime: {project.Key.Name} - Status: {project.Key.Status}\n");
                 }
             }
             if (isEmpty)
-            {
-                Console.WriteLine("Nema projekata sa takvim statusom!");
-            }
+                Console.WriteLine("Nema projekata sa takvim statusom!\n");
         }
 
         static Project PickProject()
@@ -367,20 +367,18 @@ namespace Internship_3_OOP
                 Console.WriteLine($"Projekt: {project.Key.Name}");
             }
 
-            string projectPick;
-            Project selectedProject = null;
+            Project selectedProject;
 
             do
             {
-                Console.Write("Unesi jeadn od projekata: ");
-                projectPick = Console.ReadLine();
+                Console.Write("Unesi jedan od ponudenih projekata: ");
+                var projectPick = Console.ReadLine();
 
-                selectedProject = allProjects.Keys.FirstOrDefault(proj => proj.Name.ToLower() == projectPick.ToLower());
+                selectedProject = allProjects.Keys.FirstOrDefault(proj => proj.Name.ToLower().Trim() == projectPick.ToLower().Trim());
 
                 if (selectedProject == null)
-                {
-                    Console.WriteLine("Krivi unos, unesi ponovno!");
-                }
+                    Console.WriteLine("Taj projekt ne postoji, unesi ponovno!");
+
             } while (selectedProject == null);
 
             return selectedProject;
@@ -392,20 +390,18 @@ namespace Internship_3_OOP
 
             PrintTasksByProject(pickedProject);
 
-            string taskPick;
-            ProjectTask selectedTask = null;
+            ProjectTask selectedTask;
 
             do
             {
-                Console.Write("Unesi jeadn od zadataka: ");
-                taskPick = Console.ReadLine();
+                Console.Write("Unesi jedan od zadataka: ");
+                var taskPick = Console.ReadLine();
 
-                selectedTask = allProjects[pickedProject].FirstOrDefault(task => task.Name.ToLower() == taskPick.ToLower());
+                selectedTask = allProjects[pickedProject].FirstOrDefault(task => task.Name.ToLower().Trim() == taskPick.ToLower().Trim());
 
                 if (selectedTask == null)
-                {
-                    Console.WriteLine("Krivi unos, unesi ponovno!");
-                }
+                    Console.WriteLine("Taj zadatak ne postoji, unesi ponovno!");
+
             } while (selectedTask == null);
 
             return selectedTask;
@@ -414,34 +410,34 @@ namespace Internship_3_OOP
         static void PrintTasksByProject(Project pickedProject)
         {
             Console.Clear();
-            if (allProjects.TryGetValue(pickedProject, out var tasks))
+
+            var hasTasks = true;
+            Console.WriteLine($"Zadaci za taj projekt:\n");
+            foreach (var task in allProjects[pickedProject])
             {
-                Console.WriteLine($"Zadaci za taj projekt:");
-                foreach (var task in tasks)
-                {
-                    Console.WriteLine($"Task: {task.Name} - {task.Description}, Status: {task.Status}");
-                }
+                Console.WriteLine($"Task: {task.Name} - {task.Description}, Status: {task.Status}\n");
+                hasTasks = false;
             }
 
+            if(hasTasks)
+                Console.WriteLine("Ovaj projekt jos nema zadataka!\n");
         }
 
         static void PrintProjectDetails(Project pickedProject)
         {
             Console.Clear();
 
-            Console.WriteLine($"Detaljni prikaz projekta: ");
-            Console.WriteLine($"Ime: {pickedProject.Name}\nOpis: {pickedProject.Description}\nPocetak: {pickedProject.StartOfProject}\nRok: {pickedProject.EndOfProject}\nStatus: {pickedProject.Status}");
+            Console.WriteLine($"Detaljni prikaz projekta: \n");
+            Console.WriteLine($"Ime: {pickedProject.Name}\nOpis: {pickedProject.Description}\nPocetak: {pickedProject.StartOfProject}\nRok: {pickedProject.EndOfProject}\nStatus: {pickedProject.Status}\n");
         }
 
         static void EditProjectStatus(Project pickedProject)
         {
             Console.Clear();
 
-            if (pickedProject.Status.ToString() == "Finished")
-            {
-                Console.WriteLine("Cannot edit finished project");
+            if (!CanEditProject(pickedProject))
                 return;
-            }
+
             Console.WriteLine("(Upozorenje)Ako oznacis projekt kao finished, automatski ce se svi zadaci unutar projekta oznacit kao finished\n");    
             Console.WriteLine("Novi status projekta");
 
@@ -464,11 +460,8 @@ namespace Internship_3_OOP
                         foreach(var task in allProjects[pickedProject])
                         {
                             if(task.Status.ToString() != "Finished")
-                            {
                                 task.Finished();
-                            }
                         }
-
                         return;
                     default:
                         Console.WriteLine("Krivi unos, unesi ponovno!");
@@ -481,11 +474,8 @@ namespace Internship_3_OOP
         {
             Console.Clear();
 
-            if (pickedProject.Status.ToString() == "Finished")
-            {
-                Console.WriteLine("Cannot edit finished project");
+            if (!CanEditProject(pickedProject))
                 return;
-            }
 
             Console.WriteLine("Dodaj zadatak unutar odabranog projekta");
 
@@ -499,17 +489,16 @@ namespace Internship_3_OOP
             }
 
             var taskDescription = CheckEmptyStringAndSpecialChars("opis", "zadatka");
-
             var taskDeadline = CheckDate("rok");
 
-            Console.Write("Unesi ocekivano vrijeme trajanja zadatka(u minutama): ");
-            var expectedDurationToFinish = int.Parse(Console.ReadLine());
+            int expectedDurationToFinish;
 
-            while (expectedDurationToFinish <= 0)
+            Console.Write("Unesi ocekivano vrijeme trajanja zadatka (u minutama): ");
+            while (!int.TryParse(Console.ReadLine(), out expectedDurationToFinish) || expectedDurationToFinish <= 0)
             {
                 Console.Write("Unesi pozitivan broj: ");
-                expectedDurationToFinish = int.Parse(Console.ReadLine());
             }
+            Console.WriteLine("Uspjesno dodan novi zadatak!\n");
 
             var newTask = new ProjectTask(taskName, taskDescription, taskDeadline, expectedDurationToFinish, pickedProject);
 
@@ -521,9 +510,7 @@ namespace Internship_3_OOP
             foreach(var task in pickedProjectTasks)
             {
                 if(string.Equals(task.Name, taskName , StringComparison.OrdinalIgnoreCase))
-                {
                     return true;
-                }
             }
             return false;
         }
@@ -532,11 +519,8 @@ namespace Internship_3_OOP
         {
             Console.Clear();
 
-            if (pickedProject.Status.ToString() == "Finished")
-            {
-                Console.WriteLine("Cannot edit finished task");
+            if (!CanEditProject(pickedProject))
                 return;
-            }
 
             PrintTasksByProject(pickedProject);
 
@@ -545,11 +529,9 @@ namespace Internship_3_OOP
 
             var taskFound = false;
 
-            var tasksToRemove = new List<ProjectTask>();
-
             foreach (var task in allProjects[pickedProject])
             {
-                if (task.Name.ToLower() == taskToDelete.ToLower())
+                if (string.Equals(task.Name, taskToDelete, StringComparison.OrdinalIgnoreCase))
                 {
                     taskFound = true;
 
@@ -562,22 +544,16 @@ namespace Internship_3_OOP
                         confirmation = Console.ReadLine();
                     }
 
-                    if (confirmation == "da")
-                    {
-                        tasksToRemove.Add(task);
+                    if (confirmation == "da") {
+                        allProjects[pickedProject].Remove(task);
+                        Console.WriteLine("Uspjesno izbrisan zadatak!\n");
+                        break;
                     }
                 }
             }
 
-            foreach (var task in tasksToRemove)
-            {
-                allProjects[pickedProject].Remove(task);
-            }
-
             if (!taskFound)
-            {
                 Console.WriteLine("Taj zadatak ne postoji!");
-            }
         }
 
         static void TimeToFinishTasks(Project pickedProject)
@@ -589,9 +565,7 @@ namespace Internship_3_OOP
             foreach (var task in allProjects[pickedProject])
             {
                 if (task.Status.ToString() == "Active")
-                {
                     timeToFinish += task.ExpectedDuration;
-                }
             }
 
             TimeSpan timeSpan = TimeSpan.FromMinutes(timeToFinish);
@@ -600,13 +574,13 @@ namespace Internship_3_OOP
             int hours = timeSpan.Hours;
             int remainingMinutes = timeSpan.Minutes;
 
-            Console.WriteLine($"Time to finish: {days} days, {hours} hours, and {remainingMinutes} minutes.");
+            Console.WriteLine($"Vrime potrebno za zavrsit: {days} dana, {hours} sati i {remainingMinutes} minuta.\n");
         }
 
         static void PrintTaskDetails(ProjectTask pickedTask)
         {
             Console.Clear();
-            Console.WriteLine($"Task: {pickedTask.Name} - {pickedTask.Description}, Rok: {pickedTask.Deadline}, Status: {pickedTask.Status}");
+            Console.WriteLine($"Task: {pickedTask.Name} - {pickedTask.Description}, Rok: {pickedTask.Deadline}, Status: {pickedTask.Status}, Ocekivani trajanje: {pickedTask.ExpectedDuration} minuta\n");
         }
 
         static void EditTaskStatus(ProjectTask pickedTask)
@@ -615,11 +589,11 @@ namespace Internship_3_OOP
 
             if (pickedTask.Status.ToString() == "Finished")
             {
-                Console.WriteLine("Cannot edit finished task");
+                Console.WriteLine("Ne mozes editat gotov zadatak!");
                 return;
             }
 
-            Console.WriteLine("Novi status zadatka");
+            Console.WriteLine("Novi status zadatka\n");
 
             while (true)
             {
@@ -644,7 +618,7 @@ namespace Internship_3_OOP
             }
         }
 
-        static void ProjectIsFinished(Project project)
+        static void IsProjectFinished(Project project)
         {
             if (allProjects.TryGetValue(project, out var tasks))
             {
@@ -666,6 +640,8 @@ namespace Internship_3_OOP
 
             var sortedTasks = allProjects[pickedProject].OrderBy(t => t.ExpectedDuration).ToList();
 
+            Console.WriteLine("Prikaz zadataka po duljini trajanja\n");
+
             foreach(var task in sortedTasks)
             {
                 TimeSpan timeSpan = TimeSpan.FromMinutes(task.ExpectedDuration);
@@ -674,7 +650,7 @@ namespace Internship_3_OOP
                 int hours = timeSpan.Hours;
                 int remainingMinutes = timeSpan.Minutes;
 
-                Console.WriteLine($"{task.Name} - {task.Description}, Ocekivano trajanje:  {days} dana, {hours} sati i {remainingMinutes} minuta");
+                Console.WriteLine($"{task.Name} - {task.Description}, Ocekivano trajanje:  {days} dana, {hours} sati i {remainingMinutes} minuta, Status:{task.Status}\n");
             }
         }
 
@@ -685,23 +661,35 @@ namespace Internship_3_OOP
             var mediumPriorityTasks = allProjects[pickedProject].Where(t => t.Priority.ToString() == "Medium");
             var lowPriorityTasks = allProjects[pickedProject].Where(t => t.Priority.ToString() == "Low");
 
-            Console.WriteLine("High Priority Tasks:");
+            Console.WriteLine("High prioritet zadaci:");
             foreach (var task in highPriorityTasks)
             {
-                Console.WriteLine($"Task: {task.Name}, Expected Duration: {task.ExpectedDuration}");
+                Console.WriteLine($"Task: {task.Name}, Ocekivano trajanje: {task.ExpectedDuration} minuta");
             }
 
-            Console.WriteLine("\nMedium Priority Tasks:");
+            Console.WriteLine("\nMedium prioritet zadaci:");
             foreach (var task in mediumPriorityTasks)
             {
-                Console.WriteLine($"Task: {task.Name}, Expected Duration: {task.ExpectedDuration}");
+                Console.WriteLine($"Task: {task.Name}, Ocekivano trajanje: {task.ExpectedDuration} minuta");
             }
 
-            Console.WriteLine("\nLow Priority Tasks:");
+            Console.WriteLine("\nLow prioritet zadaci:");
             foreach (var task in lowPriorityTasks)
             {
-                Console.WriteLine($"Task: {task.Name}, Expected Duration: {task.ExpectedDuration}");
+                Console.WriteLine($"Task: {task.Name}, Ocekivano trajanje: {task.ExpectedDuration} minuta");
             }
+
+            Console.WriteLine();
+        }
+
+        static bool CanEditProject(Project pickedProject)
+        {
+            if (pickedProject.Status.ToString() == "Finished")
+            {
+                Console.WriteLine("Ne mozes editat gotov projekt!");
+                return false;
+            }
+            return true;
         }
     }
 }
